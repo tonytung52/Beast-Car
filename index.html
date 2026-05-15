@@ -1,0 +1,362 @@
+# Beast-Car
+# 執行 Python 腳本生成最終 HTML
+final_html_content = """<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>川普總統座駕：野獸 (The Beast) | 2026 北京川習會特輯</title>
+    <style>
+        :root {
+            --bg-deep: #000c1d;
+            --accent-yellow: #fff200;
+            --text-white: #ffffff;
+            --card-bg: #001a35;
+            --news-red: #cc0000;
+            --code-bg: #1e1e1e;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background-color: var(--bg-deep);
+            color: var(--text-white);
+            font-family: "Microsoft JhengHei", "PingFang TC", sans-serif;
+            padding-top: 60px;
+            line-height: 1.8;
+            overflow-x: hidden;
+        }
+
+        /* 頂端新聞跑馬燈 */
+        .news-ticker {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: var(--news-red);
+            color: white;
+            padding: 12px 0;
+            font-weight: bold;
+            z-index: 1000;
+            white-space: nowrap;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.7);
+        }
+
+        .ticker-content {
+            display: inline-block;
+            padding-left: 100%;
+            animation: marquee 30s linear infinite;
+            font-size: 1.3rem;
+            letter-spacing: 2px;
+        }
+
+        @keyframes marquee {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-100%); }
+        }
+
+        /* 標題區 */
+        header {
+            text-align: center;
+            padding: 80px 20px;
+            background: linear-gradient(to bottom, #001a35, var(--bg-deep));
+        }
+
+        h1 {
+            font-size: clamp(3rem, 10vw, 5rem);
+            color: var(--accent-yellow);
+            text-transform: uppercase;
+            text-shadow: 0 0 30px rgba(255, 242, 0, 0.6);
+            letter-spacing: 8px;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            font-size: clamp(1.2rem, 4vw, 2rem);
+            color: #bdc3c7;
+        }
+
+        /* 圖片展示區 */
+        .gallery {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 25px;
+            padding: 40px 20px;
+        }
+
+        .photo-card {
+            background: var(--card-bg);
+            border: 2px solid #004d99;
+            border-radius: 15px;
+            overflow: hidden;
+            transition: 0.4s;
+            width: calc(33.333% - 40px);
+            min-width: 300px;
+        }
+
+        .photo-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 40px rgba(0, 153, 255, 0.5);
+            border-color: var(--accent-yellow);
+        }
+
+        .photo-card img {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .photo-label {
+            padding: 10px;
+            text-align: center;
+            background: rgba(0,0,0,0.5);
+            color: var(--accent-yellow);
+            font-weight: bold;
+        }
+
+        /* 互動規格面板 */
+        .interactive-section {
+            max-width: 1100px;
+            margin: 60px auto;
+            background: rgba(0, 26, 53, 0.9);
+            padding: 50px;
+            border-radius: 25px;
+            border: 1px solid #0059b3;
+        }
+
+        .spec-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 40px;
+        }
+
+        .btn-spec {
+            background: #002b5c;
+            border: 1px solid var(--accent-yellow);
+            color: #fff;
+            padding: 15px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border-radius: 8px;
+            transition: 0.3s;
+        }
+
+        .btn-spec:hover, .btn-spec.active {
+            background: var(--accent-yellow);
+            color: #000;
+        }
+
+        #spec-content {
+            font-size: 1.6rem;
+            padding: 30px;
+            border-left: 8px solid var(--accent-yellow);
+            background: rgba(255, 255, 255, 0.05);
+            min-height: 150px;
+        }
+
+        /* 詳細內容 */
+        .details {
+            max-width: 1200px;
+            margin: 0 auto 60px;
+            padding: 0 20px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+        }
+
+        .info-box {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 30px;
+            border-radius: 15px;
+        }
+
+        .info-box h2 {
+            color: var(--accent-yellow);
+            font-size: 2.2rem;
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--accent-yellow);
+            display: inline-block;
+        }
+
+        .info-box ul { list-style: square; padding-left: 20px; font-size: 1.3rem; }
+        .info-box li { margin-bottom: 10px; }
+
+        /* Python 程式碼區塊 */
+        .code-section {
+            max-width: 1200px;
+            margin: 60px auto;
+            padding: 0 20px;
+        }
+
+        .code-title {
+            color: var(--accent-yellow);
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        pre {
+            background: var(--code-bg);
+            color: #dcdcdc;
+            padding: 30px;
+            border-radius: 15px;
+            overflow-x: auto;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 1.1rem;
+            border: 1px solid #444;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .fun-fact {
+            background: linear-gradient(90deg, #f1c40f, #f39c12);
+            color: #000;
+            padding: 30px;
+            text-align: center;
+            font-size: 1.6rem;
+            font-weight: 800;
+            margin: 60px 0;
+        }
+
+        footer {
+            text-align: center;
+            padding: 40px;
+            border-top: 1px solid #333;
+            color: #777;
+        }
+
+        @media (max-width: 850px) {
+            .details { grid-template-columns: 1fr; }
+            .photo-card { width: 90%; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="news-ticker">
+        <div class="ticker-content">
+            【2026 北京川習會特訊】川普總統專屬座駕「野獸」首度亮相北京長安大街 ... 美國特勤局最高級別維安部署中 ... 凱迪拉克第三代裝甲專車防禦技術領先全球 ... 即時影像持續更新 ...
+        </div>
+    </div>
+
+    <header>
+        <h1>THE BEAST</h1>
+        <div class="subtitle">總統級移動堡壘：野獸專車 (The Beast) 完整技術解析</div>
+    </header>
+
+    <section class="gallery">
+        <div class="photo-card"><img src="image1.png" alt="Beast 1"><div class="photo-label">正面威壓感</div></div>
+        <div class="photo-card"><img src="image2.png" alt="Beast 2"><div class="photo-label">結構防禦透視</div></div>
+        <div class="photo-card"><img src="image3.png" alt="Beast 3"><div class="photo-label">車隊巡航視角</div></div>
+        <div class="photo-card"><img src="image4.png" alt="Beast 4"><div class="photo-label">北京實地部署</div></div>
+        <div class="photo-card"><img src="image5.png" alt="Beast 5"><div class="photo-label">專屬標誌與裝甲</div></div>
+        <div class="photo-card"><img src="image6.png" alt="Beast 6"><div class="photo-label">全方位安全展示</div></div>
+    </section>
+
+    <section class="interactive-section">
+        <h2 style="color: var(--accent-yellow); text-align: center; margin-bottom: 30px; font-size: 2.5rem;">戰術配備互動探索</h2>
+        <div class="spec-buttons">
+            <button class="btn-spec active" onclick="updateSpec('armor', this)">🛡️ 防禦裝甲</button>
+            <button class="btn-spec" onclick="updateSpec('bio', this)">🚑 生化醫療</button>
+            <button class="btn-spec" onclick="updateSpec('active', this)">🔥 主動防禦</button>
+            <button class="btn-spec" onclick="updateSpec('office', this)">📡 移動辦公室</button>
+        </div>
+        <div id="spec-content">
+            請點擊上方按鈕，探索野獸專車的各項軍事級黑科技。
+        </div>
+    </section>
+
+    <main class="details">
+        <div class="info-box">
+            <h2>1. 極致防禦裝甲</h2>
+            <ul>
+                <li>車門厚度逾 20 公分，重量等同波音 757 艙門。</li>
+                <li>5 層複合防彈玻璃，厚達 12.7 公分，可擋火箭彈。</li>
+                <li>軍用級複合車身，底盤可抵禦地雷直接衝擊。</li>
+            </ul>
+        </div>
+        <div class="info-box">
+            <h2>2. 生化與醫療系統</h2>
+            <ul>
+                <li>獨立供氧系統，受攻擊時車廂自動切換為 100% 氣密。</li>
+                <li>隨車儲備與總統血型匹配的血漿及基礎手術器械。</li>
+            </ul>
+        </div>
+        <div class="info-box">
+            <h2>3. 主動防禦配備</h2>
+            <ul>
+                <li>凱夫拉強化防爆胎，輪胎毀損仍能以時速 80 公里逃離。</li>
+                <li>隱藏式泵動霰彈槍、催淚瓦斯與煙霧油漬發射系統。</li>
+            </ul>
+        </div>
+        <div class="info-box">
+            <h2>4. 移動權力中心</h2>
+            <ul>
+                <li>加密衛星通訊，可隨時下達核彈發射或戰略指令。</li>
+                <li>隨行「守望者」干擾車，可阻斷遙控炸彈訊號。</li>
+            </ul>
+        </div>
+    </main>
+
+    <div class="fun-fact">
+        💡 小知識：野獸重達 9 公噸，每公升油僅跑 3.4 公里。每次出訪會同時準備 3 輛相同座車交替，沒人知道總統在哪台！
+    </div>
+
+    <section class="code-section">
+        <div class="code-title">🛠️ 部署輔助：Python 圖片自動處理腳本</div>
+        <pre>
+import zipfile
+import os
+
+# 此腳本用於自動將原始圖片重新命名並打包，以供 GitHub Pages 使用
+input_files = [
+    'input_file_0.png', 'input_file_1.png', 'input_file_2.png',
+    'input_file_3.png', 'input_file_4.png', 'input_file_5.png'
+]
+
+output_names = [f'image{i+1}.png' for i in range(len(input_files))]
+zip_filename = 'the_beast_images.zip'
+
+with zipfile.ZipFile(zip_filename, 'w') as zipf:
+    for i in range(len(input_files)):
+        src = input_files[i]
+        dst = output_names[i]
+        if os.path.exists(src):
+            zipf.write(src, arcname=dst)
+
+print(f"部署檔案已生成: {zip_filename}")
+        </pre>
+    </section>
+
+    <footer>
+        <p>© 2026 THE BEAST INTERACTIVE DOCUMENTARY | Prepared for GitHub Pages</p>
+    </footer>
+
+    <script>
+        const specs = {
+            armor: "<b>防禦裝甲：</b> 車身由鋼、鋁、鈦與陶瓷複合材料製成，車門厚達 8 英吋，關閉後達成完全氣密。底盤經過強化，可承受地雷或路邊炸彈之直接爆炸力。",
+            bio: "<b>生化醫療：</b> 具備獨立供氧系統與生化防護能力。後車箱備有總統專屬血漿，確保在遭遇緊急襲擊或受傷時能立即進行輸血救援。",
+            active: "<b>主動防禦：</b> 配備凱夫拉強化防爆胎，鋼製輪轂讓車輛在爆胎後仍能高速行駛。隱藏式武器包含泵動霰彈槍與催淚瓦斯發射器。",
+            office: "<b>移動中心：</b> 車內配備與五角大廈連線的高度加密衛星通訊系統。隨行車隊備有干擾器，能阻斷遙控炸彈訊號及攔截非法無人機。"
+        };
+
+        function updateSpec(key, btn) {
+            document.getElementById('spec-content').innerHTML = specs[key];
+            document.querySelectorAll('.btn-spec').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+        }
+
+        // 預設載入
+        window.onload = () => updateSpec('armor', document.querySelector('.btn-spec'));
+    </script>
+</body>
+</html>
+"""
+
+# 將整合內容保存為 index.html
+with open("index.html", "w", encoding="utf-8") as f:
+    f.write(final_html_content)
